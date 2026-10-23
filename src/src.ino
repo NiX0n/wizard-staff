@@ -7,13 +7,20 @@
 constexpr uint8_t DPAD_I2C_ADDRESS = 0x20;
 constexpr uint8_t DPAD_BUTTON_REGISTER = 0x00;
 
-// Active-low button values discovered experimentally.
+// Active-low button values
 constexpr uint8_t BUTTON_STATE_NONE   = 0xFF;
 constexpr uint8_t BUTTON_STATE_UP     = 0xFE;
 constexpr uint8_t BUTTON_STATE_DOWN   = 0xFD;
 constexpr uint8_t BUTTON_STATE_RIGHT  = 0xFB;
 constexpr uint8_t BUTTON_STATE_LEFT   = 0xF7;
 constexpr uint8_t BUTTON_STATE_CENTER = 0xEF;
+
+// Active-high 
+constexpr uint8_t BUTTON_UP_MASK     = 0x01;
+constexpr uint8_t BUTTON_DOWN_MASK   = 0x02;
+constexpr uint8_t BUTTON_RIGHT_MASK  = 0x04;
+constexpr uint8_t BUTTON_LEFT_MASK   = 0x08;
+constexpr uint8_t BUTTON_CENTER_MASK = 0x10;
 
 // ============================================================================
 // Staff Menu Definitions
@@ -195,41 +202,38 @@ void onCenterPressed()
 
 void processInput()
 {
-    static uint8_t previousButtonState = BUTTON_STATE_NONE;
+    static uint8_t previousState = 0;
 
-    uint8_t currentButtonState = readDPadState();
+    uint8_t currentState = ~readDPadState();
 
-    if (currentButtonState == previousButtonState)
+    uint8_t changed = currentState ^ previousState;
+    uint8_t pressed = changed & currentState;
+
+    previousState = currentState;
+
+    if (pressed & BUTTON_UP_MASK)
     {
-        return;
+        onUpPressed();
     }
 
-    previousButtonState = currentButtonState;
-
-    switch (currentButtonState)
+    if (pressed & BUTTON_DOWN_MASK)
     {
-        case BUTTON_STATE_UP:
-            onUpPressed();
-            break;
+        onDownPressed();
+    }
 
-        case BUTTON_STATE_DOWN:
-            onDownPressed();
-            break;
+    if (pressed & BUTTON_LEFT_MASK)
+    {
+        onLeftPressed();
+    }
 
-        case BUTTON_STATE_LEFT:
-            onLeftPressed();
-            break;
+    if (pressed & BUTTON_RIGHT_MASK)
+    {
+        onRightPressed();
+    }
 
-        case BUTTON_STATE_RIGHT:
-            onRightPressed();
-            break;
-
-        case BUTTON_STATE_CENTER:
-            onCenterPressed();
-            break;
-
-        default:
-            break;
+    if (pressed & BUTTON_CENTER_MASK)
+    {
+        onCenterPressed();
     }
 }
 
