@@ -1,9 +1,13 @@
 #include <Wire.h>
+#include <Adafruit_NeoPixel.h>
 
 // ============================================================================
 // Hardware Configuration
 // ============================================================================
 
+//
+// Inputs
+//
 constexpr uint8_t DPAD_I2C_ADDRESS = 0x20;
 constexpr uint8_t DPAD_BUTTON_REGISTER = 0x00;
 
@@ -21,6 +25,18 @@ constexpr uint8_t BUTTON_DOWN_MASK   = 0x02;
 constexpr uint8_t BUTTON_RIGHT_MASK  = 0x04;
 constexpr uint8_t BUTTON_LEFT_MASK   = 0x08;
 constexpr uint8_t BUTTON_CENTER_MASK = 0x10;
+
+//
+// Outputs
+//
+constexpr uint8_t N_NEOPIXEL = 40;
+constexpr uint8_t NEOPIXEL_PIN = A16;
+constexpr neoPixelType NEOPIXEL_TYPE = NEO_GRB + NEO_KHZ800;
+//constexpr uint8_t NEOPIXEL_TYPE = NEO_GRB + NEO_KHZ800;
+//constexpr uint8_t NEOPIXEL_TYPE = 0;
+
+Adafruit_NeoPixel strip(N_NEOPIXEL, NEOPIXEL_PIN, NEOPIXEL_TYPE);
+
 
 // ============================================================================
 // Staff Menu Definitions
@@ -274,6 +290,19 @@ void setup()
     Serial.println("-----------------");
 
     printCurrentSelection();
+
+    // initialize strip
+    strip.begin();
+    //strip.show(); // Initialize all pixels to 'off'
+    //strip.setBrightness(255);
+    
+    //strip.rainbow();
+    //strip.setPixelColor(0, 255, 0, 0);
+    //strip.setPixelColor(1, 0, 0, 255);
+    strip.clear();
+
+    strip.show();
+    Serial.println("LEDs Engaged!");
 }
 
 void loop()
